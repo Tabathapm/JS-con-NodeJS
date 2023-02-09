@@ -13,7 +13,8 @@ const getAll = async () => {
 
 const getById = async (id) => {
     const collection = await Database(COLLECTION);
-    return collection.findOne({ _id: ObjectId(id) });
+    const query = {_id: ObjectId(id)};
+    return collection.findOne(query);
 }
 
 const create = async (product) => {
@@ -28,11 +29,35 @@ const generateReport = async (name, res) => {
 }
 
 // update
+const updateProduct = async (id, newValue) => {
+
+    const collection = await Database(COLLECTION);
+    const filtro     = {_id: ObjectId(id)};
+    const opciones   = {upsert: false};
+
+    const update = {
+        $set: {
+            ...newValue
+        }
+    };
+
+    const result = await collection.updateOne(filtro, update, opciones);
+    return await getById(id);
+}
 // delete
+const deleteProduct = async (id) => {
+
+    const collection = await Database(COLLECTION);
+    const query      = {_id: ObjectId(id)};
+    const result     = await collection.deleteOne(query);
+    return result;
+}
 
 module.exports.ProductsService = {
     getAll,
     getById,
     create,
-    generateReport
+    generateReport,
+    updateProduct,
+    deleteProduct
 }

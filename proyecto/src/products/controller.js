@@ -53,8 +53,45 @@ module.exports.ProductsController = {
             debug(error);
             Response.error(res);
         }
-    }
+    },
 
     // update
+    updateProduct: async (req, res) => {
+        try {
+            const {params: {id}} = req;
+            const {body} = req;
+
+            if (!body || Object.keys(body).length === 0) {
+                Response.error(res, new createError.BadRequest());
+            } else {
+                const update = await ProductsService.updateProduct(id, body);
+
+                if (!update) {
+                    Response.error(res, new createError.NotFound());
+                } else {
+                    Response.success(res, 200, 'Producto modificado:', update);
+                }
+                
+            }
+        } catch (error) {
+            debug(error);
+            Response.error(res);
+        }
+    },
     // delete
+    deleteProduct: async (req, res) => {
+        try {
+            // const id = req.params.id
+            const {params: {id}} = req;
+            let result = await ProductsService.deleteProduct(id);
+            if (result.deleteCount === 1) {
+                Response.success(res, 200, `Producto ${id} borrado`, result);
+            } else {
+                Response.error(res, new createError.NotFound());
+            }
+        } catch (error) {
+            debug(error);
+            Response.error(res);
+        }
+    }
 }
